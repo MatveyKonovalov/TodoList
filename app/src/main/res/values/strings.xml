@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">My Application</string>
+
+    <!-- Дни недели-->
+    <string name="monday">Пн</string>
+    <string name="tuesday">Вт</string>
+    <string name="wednesday">Ср</string>
+    <string name="thursday">Чт</string>
+    <string name="friday">Пт</string>
+    <string name="saturday">Сб</string>
+    <string name="sunday">Вс</string>
+
+    <!--Заголовки-->
+    <string name="calendar">Календарь</string>
+    <string name="todo_list">Список дел</string>
+
+    <!--Приоритеты -->
+    <string name="easy_priority">Низкий</string>
+    <string name="medium_priority">Средний</string>
+    <string name="hard_priority">Высокий</string>
 </resources>
