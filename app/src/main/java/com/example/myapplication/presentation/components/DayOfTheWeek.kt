@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ fun DayOfTheWeek(dayNum: String, weekDay: String, modifier: Modifier = Modifier)
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .width(50.dp)
             .fillMaxHeight(0.9f)
             .clip(RoundedCornerShape(16))
             .background(MaterialTheme.colorScheme.background)
