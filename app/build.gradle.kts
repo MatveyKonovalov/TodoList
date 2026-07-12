@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -24,6 +26,7 @@ android {
     buildTypes {
         release {
             optimization {
+                //isMinifyEnabled = true // Доп преобразования к коду
                 enable = false
             }
         }
@@ -32,10 +35,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
     }
 }
+
+
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
@@ -56,4 +62,16 @@ dependencies {
 
     //Библиотека для работы с календарём
     implementation("com.kizitonwose.calendar:compose:2.10.1")
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    //Room tests
+    testImplementation(libs.androidx.room.testing)
 }
