@@ -1,0 +1,158 @@
+package com.example.myapplication.presentation.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
+import com.kizitonwose.calendar.compose.WeekCalendar
+import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
+import java.time.DayOfWeek
+import java.time.LocalDate
+
+@Composable
+fun WeeklyStrip(dates: List<Int>) {
+    // Состояние
+    val state = rememberWeekCalendarState(
+        startDate = LocalDate.now().minusWeeks(52).with(DayOfWeek.MONDAY), // Начало недели
+        endDate = LocalDate.now().plusWeeks(52), // Конечная дата
+        firstVisibleWeekDate = LocalDate.now(), // Текущая неделя
+        firstDayOfWeek = DayOfWeek.MONDAY // Первый день
+
+    )
+
+    // Сам календарь
+    WeekCalendar(
+        state = state,
+        dayContent = { day ->
+            DayOfTheWeek(
+                dayNum = day.date.dayOfMonth.toString(),
+                weekDay = printWeekDay(day.date.dayOfWeek.toString()),
+                modifier = Modifier
+                    .clickable(onClick = {/*Функция нажатия на конкретный день*/ })
+            )
+
+        },
+        modifier = Modifier
+            .height(130.dp)
+            .padding(start = 5.dp, end = 5.dp)
+            .clip(RoundedCornerShape(12))
+            .background(MaterialTheme.colorScheme.background)
+            .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.onBackground,
+                shape = RoundedCornerShape(12)
+            )
+            .padding(10.dp),
+        weekHeader = { week ->
+            val month = week.days.first().date.month
+
+            Text(
+                text = printMonth(month.toString()),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(8.dp),
+                fontSize = 20.sp
+            )
+        }
+
+    )
+
+
+}
+
+@Composable
+private fun printWeekDay(dayOfTheWeekENG: String) = when (dayOfTheWeekENG) {
+    "MONDAY" -> stringResource(R.string.monday)
+    "TUESDAY" -> stringResource(R.string.tuesday)
+    "WEDNESDAY" -> stringResource(R.string.wednesday)
+    "THURSDAY" -> stringResource(R.string.thursday)
+    "FRIDAY" -> stringResource(R.string.friday)
+    "SATURDAY" -> stringResource(R.string.saturday)
+    "SUNDAY" -> stringResource(R.string.sunday)
+    else -> "Unknown"
+}
+
+@Composable
+private fun printMonth(titleMonthENG: String) = when (titleMonthENG) {
+    "JANUARY" -> stringResource(R.string.january)
+    "FEBRUARY" -> stringResource(R.string.february)
+    "MARCH" -> stringResource(R.string.march)
+    "APRIL" -> stringResource(R.string.april)
+    "MAY" -> stringResource(R.string.may)
+    "JUNE" -> stringResource(R.string.june)
+    "JULY" -> stringResource(R.string.july)
+    "AUGUST" -> stringResource(R.string.august)
+    "SEPTEMBER" -> stringResource(R.string.september)
+    "OCTOBER" -> stringResource(R.string.october)
+    "NOVEMBER" -> stringResource(R.string.november)
+    "DECEMBER" -> stringResource(R.string.december)
+    else -> "Unknown"
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewWeeklyStrip() {
+    WeeklyStrip((1..7).toList())
+}
+
+
+
+//val dayOfWeek = listOf<String>(
+//    stringResource(R.string.monday),
+//    stringResource(R.string.tuesday),
+//    stringResource(R.string.wednesday),
+//    stringResource(R.string.thursday),
+//    stringResource(R.string.friday),
+//    stringResource(R.string.saturday),
+//    stringResource(R.string.sunday),
+//)
+// Старая реализация
+//    val dailyInfo = dates.zip(dayOfWeek)
+//    Row(
+//        verticalAlignment = Alignment.CenterVertically,
+//        horizontalArrangement = Arrangement.spacedBy(12.dp),
+//        modifier = Modifier
+//            .height(110.dp)
+//            .padding(start = 5.dp, end = 5.dp)
+//            .clip(RoundedCornerShape(12))
+//            .background(MaterialTheme.colorScheme.background)
+//            .border(
+//                width = 2.dp,
+//                color = MaterialTheme.colorScheme.onBackground,
+//                shape = RoundedCornerShape(12)
+//            )
+//            .padding(10.dp)
+//    ) {
+//        dailyInfo.forEach { data ->
+//            DayOfTheWeek( // Реализуй, что день активен
+//                dayNum = data.first.toString(),
+//                weekDay = data.second,
+//                modifier = Modifier
+//                    .weight(1f)
+//                    .clickable(onClick = {/*Функция нажатия на конкретный день*/ })
+//            )
+//        }
+//
+//    }
