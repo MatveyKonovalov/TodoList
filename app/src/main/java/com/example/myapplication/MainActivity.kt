@@ -15,8 +15,9 @@ import com.example.myapplication.presentation.MainScreen
 import com.example.myapplication.presentation.components.DayOfTheWeek
 import com.example.myapplication.presentation.components.WeeklyStrip
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 MainScreen()
+
             }
         }
     }

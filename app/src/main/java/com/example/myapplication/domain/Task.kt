@@ -1,6 +1,8 @@
 package com.example.myapplication.domain
 
 import androidx.compose.runtime.Immutable
+import java.time.LocalDate
+import java.util.Date
 import java.util.UUID
 
 
@@ -10,8 +12,8 @@ sealed class Priority {
     object Hard : Priority()
 }
 
-enum class Category(val title: String){
-   Work("Работа"),
+enum class Category(val title: String) {
+    Work("Работа"),
     SelfDevelopment("Личное саморазвитие"),
     HealthAndFitness("Здоровье и спорт"),
     HomeAndChores("Дом и быт"),
@@ -23,11 +25,23 @@ enum class Category(val title: String){
     Projects("Долгосрочные цели"),
     Unknown("Неизвестная")
 }
+
 @Immutable
 data class Task(
     val id: String = UUID.randomUUID().toString(),
     val title: String,
     val description: String,
     val priority: Priority = Priority.Easy,
-    val category: Category
-)
+    val category: Category,
+    val isComplete: Boolean = false,
+    val date: LocalDate = LocalDate.now()
+) {
+    @JvmName("getDateString")
+    fun getDate(): String {
+        val year: String = date.year.toString()
+        val month: String = date.monthValue.toString()
+        val day: String = date.dayOfMonth.toString()
+
+        return String.format("%s %s %s", day, month, year)
+    }
+}

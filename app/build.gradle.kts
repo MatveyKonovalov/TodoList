@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -74,4 +75,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     //Room tests
     testImplementation(libs.androidx.room.testing)
+    testImplementation("androidx.arch.core:core-testing:2.2.0")  // Для работы с LiveData/Flow
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")  // Для корутин
 }
