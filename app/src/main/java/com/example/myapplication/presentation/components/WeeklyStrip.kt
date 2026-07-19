@@ -33,7 +33,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Composable
-fun WeeklyStrip(dates: List<Int>) {
+fun WeeklyStrip() {
     // Состояние
     val state = rememberWeekCalendarState(
         startDate = LocalDate.now().minusWeeks(52).with(DayOfWeek.MONDAY), // Начало недели
@@ -114,7 +114,7 @@ private fun printMonth(titleMonthENG: String) = when (titleMonthENG) {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewWeeklyStrip() {
-    WeeklyStrip((1..7).toList())
+    WeeklyStrip()
 }
 
 

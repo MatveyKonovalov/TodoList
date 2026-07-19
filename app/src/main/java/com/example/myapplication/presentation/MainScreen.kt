@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -33,29 +35,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.presentation.components.WeeklyStrip
 import com.example.myapplication.R
 import com.example.myapplication.domain.Category
 import com.example.myapplication.domain.Priority
 import com.example.myapplication.domain.Task
 import com.example.myapplication.presentation.components.TaskCard
+import java.time.LocalDate
 
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel) {
     // типо таски
-    val tasks = listOf(
-        Task(
-            title = "Созвон",
-            description = "Работа. Mobile",
-            category = Category.Work
-        ),
-        Task(
-            title = "Прогулка",
-            description = "Погулять с собакой",
-            category = Category.FamilyAndFriends,
-            priority = Priority.Medium
-        )
-    )
+    LaunchedEffect(Unit) {
+        val curDate = LocalDate.now()
+        val day: Int = curDate.dayOfMonth
+        val month: Int = curDate.month.value
+        val year: Int = curDate.year
+        viewModel.loadTaskByDate(String.format("%02d.%02d.%04d", day, month, year))
+    }
+    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,7 +86,7 @@ private fun Title(btnAdd: (Unit) -> Unit = {}) {
             modifier = Modifier.padding(start = 10.dp, bottom = 5.dp)
         )
         // Недельная строка
-        WeeklyStrip((1..7).toList())
+        WeeklyStrip()
 
         // Список дел + добавить
         Row(
@@ -125,9 +126,8 @@ private fun Title(btnAdd: (Unit) -> Unit = {}) {
 }
 
 
-
 @Preview
 @Composable
-private fun ShowMainScreen(){
-    MainScreen()
+private fun ShowMainScreen() {
+    MainScreen(hiltViewModel())
 }
