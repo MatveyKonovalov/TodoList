@@ -166,7 +166,7 @@ private fun PriorityAndMake(priority: Priority) {
 private fun PreviewTaskCard() {
     TaskCard(
         Task(
-            id = "1",
+            id = 1,
             title = "Созвон по работе",
             description = "Первая работа",
             priority = Priority.Easy,

@@ -1,0 +1,28 @@
+package com.example.myapplication.data.database
+
+import android.content.Context
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DateBaseModule {
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataBase(@ApplicationContext context: Context): TaskDateBase =
+        TaskDateBase.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideDataBaseDao(taskDateBase: TaskDateBase): TaskDao = taskDateBase.taskDao()
+}

@@ -23,11 +23,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.presentation.components.WeeklyStrip
@@ -62,7 +65,9 @@ fun MainScreen() {
             .padding(top = 40.dp, start = 5.dp, end = 5.dp)
     ) {
         item { Title() }
-        items(items = tasks, key = { task -> task.id }) { task ->
+        items(items = tasks, key = { task -> task.title }) { task ->
+            val stateSwitch = rememberSaveable { mutableStateOf(task.isComplete) }
+            // Изменить здесь архитектуру
             TaskCard(task)
         }
 
@@ -117,4 +122,12 @@ private fun Title(btnAdd: (Unit) -> Unit = {}) {
         }
 
     }
+}
+
+
+
+@Preview
+@Composable
+private fun ShowMainScreen(){
+    MainScreen()
 }
