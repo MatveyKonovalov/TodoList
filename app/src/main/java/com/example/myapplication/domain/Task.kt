@@ -28,7 +28,7 @@ enum class Category(val title: String) {
 
 @Immutable
 data class Task(
-    val id: String = UUID.randomUUID().toString(),
+    val id: Long = 0,
     val title: String,
     val description: String,
     val priority: Priority = Priority.Easy,
@@ -42,6 +42,6 @@ data class Task(
         val month: String = date.monthValue.toString()
         val day: String = date.dayOfMonth.toString()
 
-        return String.format("%s %s %s", day, month, year)
+        return String.format("%02s.%02s.%s", day, month, year)
     }
 }

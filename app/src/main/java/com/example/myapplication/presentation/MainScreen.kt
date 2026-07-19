@@ -65,7 +65,7 @@ fun MainScreen() {
             .padding(top = 40.dp, start = 5.dp, end = 5.dp)
     ) {
         item { Title() }
-        items(items = tasks, key = { task -> task.id }) { task ->
+        items(items = tasks, key = { task -> task.title }) { task ->
             val stateSwitch = rememberSaveable { mutableStateOf(task.isComplete) }
             // Изменить здесь архитектуру
             TaskCard(task)

@@ -20,4 +20,10 @@ interface TaskDao{
 
     @Update
     suspend fun updateTask(taskEntity: TaskEntity)
+
+
+
+    // Suspend методы для реального кода
+    @Insert
+    fun addTaskTest(task: TaskEntity): Long
 }

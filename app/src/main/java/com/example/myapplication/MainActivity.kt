@@ -16,6 +16,7 @@ import com.example.myapplication.presentation.components.DayOfTheWeek
 import com.example.myapplication.presentation.components.WeeklyStrip
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
