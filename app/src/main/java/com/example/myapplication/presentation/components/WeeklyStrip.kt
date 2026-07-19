@@ -33,7 +33,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Composable
-fun WeeklyStrip() {
+fun WeeklyStrip(curDay: LocalDate, funcSetData: (LocalDate) -> Unit) {
     // Состояние
     val state = rememberWeekCalendarState(
         startDate = LocalDate.now().minusWeeks(52).with(DayOfWeek.MONDAY), // Начало недели
@@ -51,7 +51,8 @@ fun WeeklyStrip() {
                 dayNum = day.date.dayOfMonth.toString(),
                 weekDay = printWeekDay(day.date.dayOfWeek.toString()),
                 modifier = Modifier
-                    .clickable(onClick = {/*Функция нажатия на конкретный день*/ })
+                    .clickable(onClick = { funcSetData(day.date) }),
+                if (curDay == day.date) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.background
             )
 
         },
@@ -111,48 +112,8 @@ private fun printMonth(titleMonthENG: String) = when (titleMonthENG) {
     else -> "Unknown"
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun PreviewWeeklyStrip() {
-    WeeklyStrip()
-}
-
-
-
-//val dayOfWeek = listOf<String>(
-//    stringResource(R.string.monday),
-//    stringResource(R.string.tuesday),
-//    stringResource(R.string.wednesday),
-//    stringResource(R.string.thursday),
-//    stringResource(R.string.friday),
-//    stringResource(R.string.saturday),
-//    stringResource(R.string.sunday),
-//)
-// Старая реализация
-//    val dailyInfo = dates.zip(dayOfWeek)
-//    Row(
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.spacedBy(12.dp),
-//        modifier = Modifier
-//            .height(110.dp)
-//            .padding(start = 5.dp, end = 5.dp)
-//            .clip(RoundedCornerShape(12))
-//            .background(MaterialTheme.colorScheme.background)
-//            .border(
-//                width = 2.dp,
-//                color = MaterialTheme.colorScheme.onBackground,
-//                shape = RoundedCornerShape(12)
-//            )
-//            .padding(10.dp)
-//    ) {
-//        dailyInfo.forEach { data ->
-//            DayOfTheWeek( // Реализуй, что день активен
-//                dayNum = data.first.toString(),
-//                weekDay = data.second,
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .clickable(onClick = {/*Функция нажатия на конкретный день*/ })
-//            )
-//        }
-//
-//    }
+//@Preview(showBackground = true)
+//@Composable
+//private fun PreviewWeeklyStrip() {
+//    WeeklyStrip()
+//}

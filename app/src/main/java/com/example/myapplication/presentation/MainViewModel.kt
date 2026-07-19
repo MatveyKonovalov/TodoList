@@ -3,24 +3,23 @@ package com.example.myapplication.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.repository.Repository
 import com.example.myapplication.domain.Task
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
-
-//    private val _date = MutableStateFlow<String>("")
-//    val date = _date.asStateFlow()
+    private val _isOpenAddScreen = MutableStateFlow(false)
+    val isOpenAddScreen = _isOpenAddScreen.asStateFlow()
+    private val _date = MutableStateFlow<LocalDate>(LocalDate.now())
+    val date = _date.asStateFlow()
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     val tasks = _tasks.asStateFlow()
 
@@ -59,6 +58,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
                 }
 
             }
+            closeAddScreen()
         }
     }
 
@@ -89,7 +89,18 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         }
     }
 
-    fun setDate(date: String) {
-        loadTaskByDate(date)
+    fun setDate(date: LocalDate) { // format: dd.mm.yyyy
+        _date.value = date
+        val year = date.year
+        val month = date.monthValue
+        val day = date.dayOfMonth
+        loadTaskByDate(String.format("%02d.%02d.%04d", day, month, year))
+    }
+
+    fun openAddScreen(){
+        _isOpenAddScreen.value = true
+    }
+    fun closeAddScreen(){
+        _isOpenAddScreen.value = false
     }
 }
