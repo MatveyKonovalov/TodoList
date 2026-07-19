@@ -1,5 +1,13 @@
 package com.example.myapplication.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -13,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +39,59 @@ import com.example.myapplication.R
 import java.nio.file.WatchEvent
 
 @Composable
-fun TaskCard(task: Task) {
+fun TaskCard(
+    task: Task,
+    deleteTaskById: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isVisible by remember { mutableStateOf(true) }
+
+    // Анимация с более плавными параметрами
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            )
+        ) + scaleIn(
+            initialScale = 0.8f,
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            )
+        ),
+        exit = slideOutHorizontally(
+            targetOffsetX = { fullWidth -> fullWidth },
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            )
+        ) + fadeOut(
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            )
+        ) + shrinkOut(
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            )
+        )
+    ) {
+        TaskCardView(
+            task, deleteTaskById
+        )
+    }
+}
+
+@Composable
+fun TaskCardView(task: Task, deleteTaskById: (Long) -> Unit) {
+    val isMake = rememberSaveable { mutableStateOf(false) }
+
+    if (isMake.value) {
+        deleteTaskById(task.id)
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -48,7 +109,11 @@ fun TaskCard(task: Task) {
         Spacer(modifier = Modifier.size(10.dp))
         Description(task.description)
         Spacer(modifier = Modifier.size(10.dp))
-        PriorityAndMake(task.priority)
+        PriorityAndMake(
+            task.priority,
+            isMake = isMake.value,
+            onIsMake = { isMake.value = !isMake.value }
+        )
     }
 }
 
@@ -104,7 +169,7 @@ private fun Description(description: String) {
 }
 
 @Composable
-private fun PriorityAndMake(priority: Priority) {
+private fun PriorityAndMake(priority: Priority, isMake: Boolean, onIsMake: () -> Unit) {
     // Задаём цвета и текст
     val colorPriority: Color
     val textPriority = when (priority) {
@@ -123,11 +188,6 @@ private fun PriorityAndMake(priority: Priority) {
             stringResource(R.string.hard_priority)
         }
     }
-
-    // Делаем контейнер
-
-    // ПОТОМ ИЗМЕНИ СОСТОЯНИЕ
-    var isMake by remember { mutableStateOf(false) }
 
 
     Column(
@@ -149,7 +209,7 @@ private fun PriorityAndMake(priority: Priority) {
         Text(text = textPriority, color = colorPriority)
         Switch(
             checked = isMake,
-            onCheckedChange = { isMake = !isMake },
+            onCheckedChange = { onIsMake() },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.onBackground,
                 checkedTrackColor = colorPriority,
@@ -161,17 +221,5 @@ private fun PriorityAndMake(priority: Priority) {
 
 }
 
-@Preview
-@Composable
-private fun PreviewTaskCard() {
-    TaskCard(
-        Task(
-            id = 1,
-            title = "Созвон по работе",
-            description = "Первая работа",
-            priority = Priority.Easy,
-            category = Category.FamilyAndFriends
-        )
-    )
-}
+
 

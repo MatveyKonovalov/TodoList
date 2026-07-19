@@ -57,17 +57,15 @@ fun MainScreen(viewModel: MainViewModel) {
         val day: Int = curDate.dayOfMonth
         val month: Int = curDate.month.value
         val year: Int = curDate.year
-        viewModel.loadTaskByDate(String.format("%02d.%02d.%04d", day, month, year))
     }
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
     val curDate by viewModel.date.collectAsStateWithLifecycle()
     val isAdd by viewModel.isOpenAddScreen.collectAsStateWithLifecycle()
 
     if (isAdd) {
-        AddTask(viewModel::closeAddScreen) { task ->
-            viewModel.addTask(task)
-        }
+        AddTask(viewModel::closeAddScreen, viewModel::addTask, curDate)
     }
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -101,10 +99,10 @@ fun MainScreen(viewModel: MainViewModel) {
                 )
             }
         } else {
-            items(items = tasks, key = { task -> task.title }) { task ->
+            items(items = tasks, key = { task -> task.id }) { task ->
                 val stateSwitch = rememberSaveable { mutableStateOf(task.isComplete) }
                 // Изменить здесь архитектуру
-                TaskCard(task)
+                TaskCard(task, viewModel::deleteTask)
             }
         }
 
@@ -157,7 +155,7 @@ private fun Title(
                         color = MaterialTheme.colorScheme.onBackground,
                         shape = RoundedCornerShape(30)
                     )
-                    .clickable(onClick = { btnAdd })
+                    .clickable(onClick = btnAdd)
 
             )
 

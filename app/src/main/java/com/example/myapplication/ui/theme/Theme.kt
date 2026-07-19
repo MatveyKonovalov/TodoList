@@ -21,7 +21,7 @@ private val DarkColorScheme = darkColorScheme(
     // Цвет контейнера с таской
     secondaryFixed =Color(0xFF4C5866),
     onSecondary = Color(0xFF474A51),
-
+    primaryContainer = Color(0xFF293133),
     // Цвета приоритетов
     onTertiary = Color(0xFF0ABAB5), // Изи
     onTertiaryContainer = Color(0xFFCC7722), // Медиум
@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-
+    primaryContainer = Color(0xFF293133),
     background = Color(0xFF000000),
     onBackground= Color(0xFFFFFFFF),
     secondaryFixed =Color(0xFF4C5866),

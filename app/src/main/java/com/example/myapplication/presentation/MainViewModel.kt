@@ -3,104 +3,117 @@ package com.example.myapplication.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.repository.Repository
 import com.example.myapplication.domain.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class MainViewModel @Inject constructor(
+    private val repository: Repository
+) : ViewModel() {
+
+    // Дата
+    private val _date = MutableStateFlow(LocalDate.now())
+    val date = _date.asStateFlow()
+
+    val tasks: StateFlow<List<Task>>
+        get() = _date.flatMapLatest {
+            repository.getTasksByDate(date.value.getDateString())
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
+
+    // Флаг открытого диалога добавления
     private val _isOpenAddScreen = MutableStateFlow(false)
     val isOpenAddScreen = _isOpenAddScreen.asStateFlow()
-    private val _date = MutableStateFlow<LocalDate>(LocalDate.now())
-    val date = _date.asStateFlow()
-    private val _tasks = MutableStateFlow<List<Task>>(emptyList())
-    val tasks = _tasks.asStateFlow()
 
+    // Флаг загрузки
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-
-    fun loadTaskByDate(date: String) { // Загрузка задач по дате
+    // ✅ Добавление задачи - БД сама уведомит об изменениях
+    fun addTask(task: Task) {
         viewModelScope.launch {
-            _isLoading.value = true
-
             try {
-                repository.getTasksByDate(date).collect { taskList ->
-                    _tasks.value = taskList
-                    _isLoading.value = false
-                    Log.d("Success in view model: loadTaskByDate", "Tasks have been loaded")
+                _isLoading.value = true
+
+                withContext(Dispatchers.IO) {
+                    repository.addTask(task)
                 }
+                closeAddScreen()
 
             } catch (e: Exception) {
-                Log.d("Error in ViewModel: loadTaskById", e.message.toString())
+                Log.e("MainViewModel", "Error adding task", e)
+            } finally {
                 _isLoading.value = false
             }
         }
-
     }
 
-    fun addTask(task: Task) { // Добавление задачи
+    fun updateTask(task: Task) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    repository.addTask(task)
-                }.onFailure {
-                    Log.d("Error in view model: addAlarm", it.message.toString())
-                }.onSuccess {
-                    Log.d("Success in view model: addTask", "Task has been added")
+            try {
+                _isLoading.value = true
+
+                withContext(Dispatchers.IO) {
+                    repository.updateTask(task)
                 }
 
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error updating task", e)
+            } finally {
+                _isLoading.value = false
             }
-            closeAddScreen()
         }
     }
 
-    fun updateTask(task: Task) { // Обновление задачи
+    fun deleteTask(taskId: Long) {
         viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                delay(1000L.milliseconds)
 
-            runCatching {
-                repository.updateTask(task)
-            }.onFailure {
-                Log.d("Error in view model: updateAlarm", it.message.toString())
-            }.onSuccess {
-                Log.d("Success in view model: updateAlarm", "Task has been updated")
+                withContext(Dispatchers.IO) {
+                    repository.deleteTaskById(taskId)
+                }
+
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error deleting task", e)
+            } finally {
+                _isLoading.value = false
             }
-
         }
     }
 
-    fun deleteTask(taskId: Long) { // Удаление задачи
-        viewModelScope.launch {
-            runCatching {
-                repository.deleteTaskById(taskId)
-            }.onFailure {
-                Log.d("Error in view model: deleteTask", it.message.toString())
-            }.onSuccess {
-                Log.d("Success in view model: deleteTask", "Task has been deleted")
-            }
-
-        }
-    }
-
-    fun setDate(date: LocalDate) { // format: dd.mm.yyyy
+    fun setDate(date: LocalDate) {
         _date.value = date
-        val year = date.year
-        val month = date.monthValue
-        val day = date.dayOfMonth
-        loadTaskByDate(String.format("%02d.%02d.%04d", day, month, year))
     }
 
-    fun openAddScreen(){
+    fun openAddScreen() {
         _isOpenAddScreen.value = true
     }
-    fun closeAddScreen(){
+
+    fun closeAddScreen() {
         _isOpenAddScreen.value = false
     }
+}
+
+fun LocalDate.getDateString(): String {
+    return String.format("%02d.%02d.%04d", dayOfMonth, monthValue, year)
 }
