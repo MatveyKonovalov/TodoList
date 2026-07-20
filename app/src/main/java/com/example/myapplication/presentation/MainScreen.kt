@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,8 +23,11 @@ import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -61,53 +66,51 @@ fun MainScreen(viewModel: MainViewModel) {
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
     val curDate by viewModel.date.collectAsStateWithLifecycle()
     val isAdd by viewModel.isOpenAddScreen.collectAsStateWithLifecycle()
+    val isErrorAdd by viewModel.isErrorAdd.collectAsStateWithLifecycle()
 
     if (isAdd) {
-        AddTask(viewModel::closeAddScreen, viewModel::addTask, curDate)
+        AddTask(
+            viewModel::closeAddScreen,
+            viewModel::addTask,
+            curDate,
+            isErrorAdd,
+            viewModel::showError
+        )
     }
-
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+    Column(
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(top = 40.dp, start = 5.dp, end = 5.dp)
     ) {
-        item {
-            Title(
-                curDate = curDate,
-                funcSetData = viewModel::setDate, viewModel::openAddScreen
-            )
-        }
+        Title(
+            curDate = curDate,
+            funcSetData = viewModel::setDate, viewModel::openAddScreen
+        )
         if (tasks.isEmpty()) {
-            item {
+            Text(
+                text = stringResource(R.string.no_task_provided),
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                fontSize = 22.sp,
+                modifier = Modifier
+                    .padding(top = 15.dp)
+                    .fillMaxWidth(0.9f)
+                    .height(100.dp)
+                    .clip(RoundedCornerShape(16))
+                    .background(MaterialTheme.colorScheme.onSecondary)
+                    .wrapContentSize(Alignment.Center)
 
-                Text(
-                    text = stringResource(R.string.no_task_provided),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    fontSize = 22.sp,
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(16))
-                        .background(MaterialTheme.colorScheme.onSecondary)
-                        .wrapContentSize(Alignment.Center)
 
-
-                )
-            }
+            )
         } else {
-            items(items = tasks, key = { task -> task.id }) { task ->
-                val stateSwitch = rememberSaveable { mutableStateOf(task.isComplete) }
-                // Изменить здесь архитектуру
-                TaskCard(task, viewModel::deleteTask)
-            }
+            Tasks(tasks, viewModel::deleteTask)
         }
-
 
     }
+
 }
 
 @Composable
@@ -164,6 +167,92 @@ private fun Title(
     }
 }
 
+@Composable
+private fun Tasks(tasks: List<Task>, deleteTask: (Long) -> Unit) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top = 15.dp, start = 5.dp, end = 5.dp, bottom = 40.dp)
+    ) {
+
+
+        items(items = tasks, key = { task -> task.id }) { task ->
+            TaskCard(task, deleteTask)
+//            SwipeableTaskItem(task, deleteTask)
+        }
+    }
+}
+
+@Composable
+private fun SwipeableTaskItem(
+    task: Task,
+    onDelete: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { dismissValue ->
+            when (dismissValue) {
+                SwipeToDismissBoxValue.EndToStart -> { // Свайп влево
+                    onDelete(task.id)
+                    true
+                }
+
+                SwipeToDismissBoxValue.StartToEnd -> { // Свайп вправо
+                    // добавить переход к редактированию
+                    false
+                }
+
+                SwipeToDismissBoxValue.Settled -> false
+            }
+
+        }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            // ✅ Фон, который показывается при свайпе
+            when (dismissState.dismissDirection) {
+                SwipeToDismissBoxValue.EndToStart -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.onTertiaryFixed)
+                            .padding(end = 24.dp),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text("Удалить", color = Color.White)
+                    }
+                }
+
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.tertiary)
+                            .padding(start = 24.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text("Редактировать", color = Color.White)
+                    }
+                }
+
+                else -> {}
+            }
+        },
+        modifier = modifier.fillMaxWidth()
+    ) {
+
+        TaskCard(
+            task = task,
+            deleteTaskById = onDelete,
+
+            )
+    }
+}
 
 @Preview
 @Composable

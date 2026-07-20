@@ -21,11 +21,12 @@
     <string name="priority">Приоритет</string>
     <string name="category">Категория</string>
     <string name="select_category">Выберите категорию</string>
-    <string name="enter_title">Введите название задачи</string>
+    <string name="enter_title">Введите название задачи (огр. 12 символов)</string>
     <string name="enter_description">Введите описание (необязательно)</string>
     <string name="title_required">Название не может быть пустым</string>
     <string name="category_required">Выберите категорию</string>
     <string name="title_description">Основная информация</string>
+    <string name="error_in_make_toast">Введите описание</string>
 
     <!--Приоритеты -->
     <string name="easy_priority">Низкий</string>

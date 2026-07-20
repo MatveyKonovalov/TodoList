@@ -30,9 +30,8 @@ class MainViewModel @Inject constructor(
     private val _date = MutableStateFlow(LocalDate.now())
     val date = _date.asStateFlow()
 
-    val tasks: StateFlow<List<Task>>
-        get() = _date.flatMapLatest {
-            repository.getTasksByDate(date.value.getDateString())
+    val tasks: StateFlow<List<Task>> = _date.flatMapLatest {date->
+            repository.getTasksByDate(date.getDateString())
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -46,6 +45,10 @@ class MainViewModel @Inject constructor(
     // Флаг загрузки
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
+    // Флаг ошибки
+    private val _isErrorAdd = MutableStateFlow(false)
+    val isErrorAdd = _isErrorAdd.asStateFlow()
 
     // ✅ Добавление задачи - БД сама уведомит об изменениях
     fun addTask(task: Task) {
@@ -111,6 +114,14 @@ class MainViewModel @Inject constructor(
 
     fun closeAddScreen() {
         _isOpenAddScreen.value = false
+    }
+
+    fun showError(){
+        viewModelScope.launch {
+            _isErrorAdd.value = true
+            delay(2000L.milliseconds)
+            _isErrorAdd.value = false
+        }
     }
 }
 

@@ -156,7 +156,8 @@ private fun Description(description: String) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .fillMaxWidth(0.65f),
+            .fillMaxWidth(0.65f)
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center
     ) {
         Text(
