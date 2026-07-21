@@ -2,8 +2,6 @@ package com.example.myapplication.domain
 
 import androidx.compose.runtime.Immutable
 import java.time.LocalDate
-import java.util.Date
-import java.util.UUID
 
 
 sealed class Priority {

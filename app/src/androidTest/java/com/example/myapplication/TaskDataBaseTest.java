@@ -18,8 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.time.LocalDate;
-import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 public class TaskDataBaseTest {
