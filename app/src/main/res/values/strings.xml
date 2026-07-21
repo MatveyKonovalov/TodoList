@@ -11,22 +11,24 @@
     <string name="sunday">Вс</string>
 
     <!--Заголовки-->
+    <string name="add_task_title">Добавить задачу</string>
     <string name="calendar">Календарь</string>
     <string name="todo_list">Список дел</string>
     <string name="no_task_provided">Пока нет ни одной задачи</string>
-    <string name="add_task">Добавить задачу</string>
+    <string name="add_task">Сохранить</string>
     <string name="cancel">Отмена</string>
     <string name="add_title">Добавить название</string>
     <string name="add_description">Описание</string>
     <string name="priority">Приоритет</string>
     <string name="category">Категория</string>
     <string name="select_category">Выберите категорию</string>
-    <string name="enter_title">Введите название задачи</string>
+    <string name="enter_title">Введите название задачи (огр. 12 символов)</string>
     <string name="enter_description">Введите описание (необязательно)</string>
     <string name="title_required">Название не может быть пустым</string>
     <string name="category_required">Выберите категорию</string>
     <string name="title_description">Основная информация</string>
-
+    <string name="error_in_make_toast">Введите описание</string>
+    <string name="update_title">Редактировать задачу</string>
     <!--Приоритеты -->
     <string name="easy_priority">Низкий</string>
     <string name="medium_priority">Средний</string>

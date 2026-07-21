@@ -32,7 +32,7 @@ data class Task(
     val title: String,
     val description: String,
     val priority: Priority = Priority.Easy,
-    val category: Category,
+    val category: Category = Category.Unknown,
     val isComplete: Boolean = false,
     val date: LocalDate = LocalDate.now()
 ) {
