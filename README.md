@@ -2,6 +2,11 @@
 
 **TodoList** — это современное Android-приложение для управления задачами, построенное на **Jetpack Compose** с использованием **Clean Architecture**. Оно позволяет легко добавлять, отсматривать, редактировать и удалять задачи, а также фильтровать их по датам.
 
+<p align="center">
+   <img width="300" height="533" alt="IMG_20260721_213633" src="https://github.com/user-attachments/assets/75bb6595-75ca-479f-9385-4daf86f7a0c1" />
+   <img width="300" height="533" alt="IMG_20260721_213542" src="https://github.com/user-attachments/assets/6629adfd-d548-4f45-93e9-88fc80c66eea" />
+</p>
+
 ## ✨ Основной функционал
 
 *   **Управление задачами (CRUD):** Полный цикл работы с задачами — создание, просмотр, редактирование и удаление.
