@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Flow</string>
+    <string name="app_name">Task Stream</string>
 
     <!-- Дни недели-->
     <string name="monday">Пн</string>

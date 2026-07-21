@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.myapplication"
+    namespace = "com.example.flowstasksapp"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.example.flowstasksapp"
         minSdk = 29
         targetSdk = 37
         versionCode = 1
