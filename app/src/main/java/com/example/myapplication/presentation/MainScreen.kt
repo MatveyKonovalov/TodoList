@@ -1,80 +1,75 @@
 package com.example.myapplication.presentation
 
-import android.R.attr.textSize
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.presentation.components.WeeklyStrip
 import com.example.myapplication.R
-import com.example.myapplication.domain.Category
-import com.example.myapplication.domain.Priority
 import com.example.myapplication.domain.Task
-import com.example.myapplication.presentation.components.AddTask
+import com.example.myapplication.presentation.components.ShowDialog
 import com.example.myapplication.presentation.components.TaskCard
+import com.example.myapplication.presentation.components.WeeklyStrip
 import java.time.LocalDate
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    LaunchedEffect(Unit) {
-        val curDate = LocalDate.now()
-        val day: Int = curDate.dayOfMonth
-        val month: Int = curDate.month.value
-        val year: Int = curDate.year
-    }
-    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
-    val curDate by viewModel.date.collectAsStateWithLifecycle()
-    val isAdd by viewModel.isOpenAddScreen.collectAsStateWithLifecycle()
-    val isErrorAdd by viewModel.isErrorAdd.collectAsStateWithLifecycle()
 
+    val tasks by viewModel.tasks.collectAsStateWithLifecycle() // все задачи на текущий день
+    val curDate by viewModel.date.collectAsStateWithLifecycle() // текущая дата
+    val isAdd by viewModel.isOpenAddScreen.collectAsStateWithLifecycle() // Открыто ли окно добавления
+    val isError by viewModel.isErrorAdd.collectAsStateWithLifecycle() // ,Была ли ошибка
+    val isUpdate by viewModel.isOpenUpdateTaskScreen.collectAsStateWithLifecycle() // Открыто ли окно редактирования
+    val selectedTask by viewModel.selectedTask.collectAsStateWithLifecycle() // Выбранная задача
+
+    // Окно добавления
     if (isAdd) {
-        AddTask(
+        ShowDialog(
             viewModel::closeAddScreen,
             viewModel::addTask,
             curDate,
-            isErrorAdd,
-            viewModel::showError
+            isError,
+            viewModel::showError,
+            null,
+            stringResource(R.string.add_task_title)
+        )
+    }
+
+    // Окно редактирования
+    if (isUpdate) {
+        ShowDialog(
+            viewModel::closeUpdateTaskScreen,
+            viewModel::updateTask,
+            curDate,
+            isError,
+            viewModel::showError,
+            selectedTask,
+            stringResource(R.string.update_title)
         )
     }
     Column(
@@ -106,7 +101,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
             )
         } else {
-            Tasks(tasks, viewModel::deleteTask)
+            Tasks(tasks, viewModel::deleteTask, viewModel::openUpdateTaskScreen)
         }
 
     }
@@ -168,7 +163,12 @@ private fun Title(
 }
 
 @Composable
-private fun Tasks(tasks: List<Task>, deleteTask: (Long) -> Unit) {
+private fun Tasks(
+    tasks: List<Task>,
+    deleteTask: (Long) -> Unit,
+    funcClick: (Task) -> Unit
+) {
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -180,79 +180,83 @@ private fun Tasks(tasks: List<Task>, deleteTask: (Long) -> Unit) {
 
 
         items(items = tasks, key = { task -> task.id }) { task ->
-            TaskCard(task, deleteTask)
+            TaskCard(
+                task, deleteTask,
+                modifier = Modifier.clickable(onClick = { funcClick(task)
+                Log.w("Task edit", "${task.id}")})
+            )
 //            SwipeableTaskItem(task, deleteTask)
         }
     }
 }
 
-@Composable
-private fun SwipeableTaskItem(
-    task: Task,
-    onDelete: (Long) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { dismissValue ->
-            when (dismissValue) {
-                SwipeToDismissBoxValue.EndToStart -> { // Свайп влево
-                    onDelete(task.id)
-                    true
-                }
-
-                SwipeToDismissBoxValue.StartToEnd -> { // Свайп вправо
-                    // добавить переход к редактированию
-                    false
-                }
-
-                SwipeToDismissBoxValue.Settled -> false
-            }
-
-        }
-    )
-
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {
-            // ✅ Фон, который показывается при свайпе
-            when (dismissState.dismissDirection) {
-                SwipeToDismissBoxValue.EndToStart -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.onTertiaryFixed)
-                            .padding(end = 24.dp),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        Text("Удалить", color = Color.White)
-                    }
-                }
-
-                SwipeToDismissBoxValue.StartToEnd -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.tertiary)
-                            .padding(start = 24.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Text("Редактировать", color = Color.White)
-                    }
-                }
-
-                else -> {}
-            }
-        },
-        modifier = modifier.fillMaxWidth()
-    ) {
-
-        TaskCard(
-            task = task,
-            deleteTaskById = onDelete,
-
-            )
-    }
-}
+//@Composable
+//private fun SwipeableTaskItem(
+//    task: Task,
+//    onDelete: (Long) -> Unit,
+//    modifier: Modifier = Modifier
+//) {
+//    val dismissState = rememberSwipeToDismissBoxState(
+//        confirmValueChange = { dismissValue ->
+//            when (dismissValue) {
+//                SwipeToDismissBoxValue.EndToStart -> { // Свайп влево
+//                    onDelete(task.id)
+//                    true
+//                }
+//
+//                SwipeToDismissBoxValue.StartToEnd -> { // Свайп вправо
+//                    // добавить переход к редактированию
+//                    false
+//                }
+//
+//                SwipeToDismissBoxValue.Settled -> false
+//            }
+//
+//        }
+//    )
+//
+//    SwipeToDismissBox(
+//        state = dismissState,
+//        backgroundContent = {
+//            // ✅ Фон, который показывается при свайпе
+//            when (dismissState.dismissDirection) {
+//                SwipeToDismissBoxValue.EndToStart -> {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .background(MaterialTheme.colorScheme.onTertiaryFixed)
+//                            .padding(end = 24.dp),
+//                        contentAlignment = Alignment.CenterEnd
+//                    ) {
+//                        Text("Удалить", color = Color.White)
+//                    }
+//                }
+//
+//                SwipeToDismissBoxValue.StartToEnd -> {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .background(MaterialTheme.colorScheme.tertiary)
+//                            .padding(start = 24.dp),
+//                        contentAlignment = Alignment.CenterStart
+//                    ) {
+//                        Text("Редактировать", color = Color.White)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        },
+//        modifier = modifier.fillMaxWidth()
+//    ) {
+//
+//        TaskCard(
+//            task = task,
+//            deleteTaskById = onDelete,
+//
+//            )
+//    }
+//}
 
 @Preview
 @Composable

@@ -80,13 +80,13 @@ fun TaskCard(
         )
     ) {
         TaskCardView(
-            task, deleteTaskById
+            task, deleteTaskById, modifier
         )
     }
 }
 
 @Composable
-fun TaskCardView(task: Task, deleteTaskById: (Long) -> Unit) {
+fun TaskCardView(task: Task, deleteTaskById: (Long) -> Unit, modifier: Modifier = Modifier) {
     val isMake = rememberSaveable { mutableStateOf(false) }
 
     if (isMake.value) {
@@ -103,6 +103,7 @@ fun TaskCardView(task: Task, deleteTaskById: (Long) -> Unit) {
                 color = MaterialTheme.colorScheme.onBackground,
                 shape = RoundedCornerShape(16)
             )
+            .then(modifier)
 
     ) {
         TitleAndCategory(task.title, task.category.title)

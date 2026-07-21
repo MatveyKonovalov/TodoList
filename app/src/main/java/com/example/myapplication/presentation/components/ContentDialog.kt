@@ -1,18 +1,11 @@
 package com.example.myapplication.presentation.components
 
-import android.content.Context
-import android.graphics.drawable.GradientDrawable
-import android.util.Log
-import android.view.Gravity
-import android.widget.TextView
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,199 +21,27 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.myapplication.R
 import com.example.myapplication.domain.Category
 import com.example.myapplication.domain.Priority
-import com.example.myapplication.domain.Task
-import java.time.LocalDate
+
+// Экран добавления задачи
 
 @Composable
-fun AddTask(
-    onDismissFunc: () -> Unit,
-    confirmButton: (Task) -> Unit,
-    curDate: LocalDate,
-    isErrorAdd: Boolean,
-    funcShowError: () -> Unit
-) {
-    // Параметры для создания новой задачи
-    val title = rememberSaveable { mutableStateOf("") }
-    val description = rememberSaveable { mutableStateOf("") }
-    val selectedCategory = remember { mutableStateOf(Category.Unknown) }
-    val priorities = listOf(Priority.Easy, Priority.Medium, Priority.Hard)
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(priorities[0]) }
-
-    // Вывод при ошибке
-    val message = stringResource(R.string.error_in_make_toast)
-    val backgroundColor = MaterialTheme.colorScheme.primaryContainer.toArgb()
-    val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
-    val context = LocalContext.current
-    LaunchedEffect(isErrorAdd) {
-        if (isErrorAdd) {
-            showCustomToast(context, message, backgroundColor, textColor)
-        }
-    }
-
-
-    Dialog(
-        onDismissRequest = onDismissFunc,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Заголовок
-                Text(
-                    text = stringResource(R.string.add_task),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                // Содержимое
-                Content(
-                    title = title.value,
-                    description = description.value,
-                    selectedCategory = selectedCategory.value,
-                    selectedOpinion = selectedOption,
-                    onTitleChange = { newText: String -> title.value = newText },
-                    onDescriptionChange = { newDescription: String ->
-                        description.value = newDescription
-                    },
-                    onCategoryChange = { category: Category -> selectedCategory.value = category },
-                    onPriorityChange = onOptionSelected,
-                    isErrorAdd
-                )
-
-                // Кнопки
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = onDismissFunc
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 16.sp
-                        )
-                    }
-
-                    TextButton(
-                        onClick = {
-                            if (title.value.isNotBlank()) {
-                                val newTask = Task(
-                                    title = title.value.trim().take(15),
-                                    description = description.value.trim(),
-                                    priority = selectedOption,
-                                    category = selectedCategory.value,
-                                    date = curDate
-                                )
-
-                                confirmButton(newTask)
-                                onDismissFunc()
-                            } else {
-                                funcShowError()
-                                Log.w(
-                                    "AddTask",
-                                    "Validation failed: title=${title.value}, category=${selectedCategory.value}"
-                                )
-                            }
-                        }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.add_task),
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Вывод всплывающего окна, говорящего об ошибке
-private fun showCustomToast(
-    context: Context,
-    message: String,
-    backgroundColor: Int,
-    textColor: Int
-) {
-    val toast = Toast(context)
-
-    val textView = TextView(context).apply {
-        text = message
-        setTextColor(textColor)
-        setPadding(48, 24, 48, 24)
-        textSize = 14f
-        setBackgroundColor(backgroundColor)
-
-        // Создание закругления
-        val drawable = GradientDrawable().apply {
-            setColor(backgroundColor)
-            cornerRadius = 16f
-        }
-        background = drawable
-    }
-
-    toast.view = textView
-    toast.duration = Toast.LENGTH_SHORT
-    toast.setGravity(Gravity.BOTTOM, 0, 100)
-    toast.show()
-}
-
-@Composable
-private fun Content(
+fun Content(
     title: String,
     description: String,
     selectedCategory: Category,
