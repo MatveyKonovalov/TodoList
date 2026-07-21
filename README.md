@@ -13,7 +13,7 @@
 
 Проект использует современный стек технологий, обеспечивающий производительность, масштабируемость и удобство разработки:
 
-*   **Язык:** [Kotlin](https://kotlinlang.org/) — основной язык разработки.
+*   **Язык:** Kotlin — основной язык разработки, Java — основной язык тестов.
 *   **UI Фреймворк:** [Jetpack Compose](https://developer.android.com/jetpack/compose) — для декларативного построения пользовательского интерфейса.
 *   **Архитектура:** [Clean Architecture](https://developer.android.com/topic/architecture) — разделение на слои `data`, `domain`, `presentation` для гибкости и тестируемости.
 *   **Локальная база данных:** [Room](https://developer.android.com/topic/libraries/architecture/room) — для хранения задач на устройстве.
