@@ -136,8 +136,8 @@ fun ShowDialog(
                         if (title.value.isNotBlank()) {
                             val newTask = getTask(
                                 task = task,
-                                title = title.value,
-                                description = description.value,
+                                title = title.value.take(12),
+                                description = description.value.take(50),
                                 priority = selectedOption,
                                 category = selectedCategory.value,
                                 date = curDate
