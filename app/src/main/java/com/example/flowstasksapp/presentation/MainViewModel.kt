@@ -67,9 +67,9 @@ class MainViewModel @Inject constructor(
                     repository.addTask(task)
                 }
                 closeAddScreen()
-
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Error adding task", e)
+                closeAddScreen()
             } finally {
                 _isLoading.value = false
             }
@@ -85,9 +85,9 @@ class MainViewModel @Inject constructor(
                     repository.updateTask(task)
                 }
                 closeUpdateTaskScreen()
-
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Error updating task", e)
+                closeUpdateTaskScreen()
             } finally {
                 _isLoading.value = false
             }
