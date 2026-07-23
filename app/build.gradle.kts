@@ -40,10 +40,15 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 
-
+val mockVersion = "1.14.11"
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -81,4 +86,7 @@ dependencies {
     // Hilt tests
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.60.1")
     kspAndroidTest("com.google.dagger:hilt-compiler:2.60.1")
+
+    // Mock
+    testImplementation("io.mockk:mockk:${mockVersion}")
 }
